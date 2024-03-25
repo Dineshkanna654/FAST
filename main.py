@@ -3,6 +3,8 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from qapairs import CleanedDataSet
 from chatbot import preprocess_data, get_answer
 from transformers import GPT2Tokenizer, GPT2LMHeadModel
+from utils import customer_total_value
+from utils2 import retrieve_the_multiple_products_in_one_invoice_list
 
 app = FastAPI()
 
@@ -34,6 +36,12 @@ async def get_answer_for_question(question: str):
         return {"answer": response}
     else:
         raise HTTPException(status_code=404, detail="Answer not found")
+    
+@app.post("/get_total_value")
+async def get_total_value():
+    csv_file = "erp100.csv"
+    return customer_total_value(csv_file)
+
 
 
 if __name__ == "__main__":
