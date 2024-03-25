@@ -1,31 +1,22 @@
-# In one invoice number have multiple product descriptions
-import csv
-from collections import defaultdict
-import json
- 
-def retrieve_the_multiple_products_in_one_invoice_list(csv_file):
-    seen_rows = defaultdict(list)
-    duplicate_rows = []
+import spacy
 
-    with open(csv_file, 'r') as file:
-        reader = csv.DictReader(file)
-        for row in reader:
-            key = (row['customer_name'], row['invoice_no'], row['invoice_date'], row['total_value'])
-            seen_rows[key].append((row['customer_name'], row['invoice_no'], row['invoice_date'], row['total_value']))
+nlp = spacy.load("en_core_web_sm")
+input_text = "Net value"
 
-        for key, rows in seen_rows.items():
-            if len(rows) > 1:  # If there are duplicates
-                duplicate_rows.extend(rows)
+def total_value(input_text , exi_qa_pairs):
+    for total_value_qapairs in exi_qa_pairs["qa_pairs"]:
+        if input_text.lower() in exi_qa_pairs["question"].lower():
+            return total_value_qapairs
+        # {
+        # "question": "What is the Total value or Net value for Amman Auto Agency?",
+        # "answer": "7480.0"
+        # }
+    return None
 
-    # Remove empty dictionaries
-    duplicate_rows = [row for row in duplicate_rows if any(row)]
-
-    return json.dumps(duplicate_rows)
-
-csv_file = "erp100.csv" 
-result = retrieve_the_multiple_products_in_one_invoice_list(csv_file)
-# print("oii",result) 
-
-
-
-
+def extract_organization_entities(question):
+    doc = nlp(question)
+    organizations = []
+    for entity in doc.ents:
+        if entity.label_ == "ORG":
+            organizations.append(entity.text)
+    return organizations

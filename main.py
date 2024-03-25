@@ -1,10 +1,11 @@
 from fastapi import FastAPI, HTTPException
 from sklearn.feature_extraction.text import TfidfVectorizer
-from qapairs import CleanedDataSet
+from qapairs import CleanedDataSet, migrate_total_value_and_customer_names
 from chatbot import preprocess_data, get_answer
 from transformers import GPT2Tokenizer, GPT2LMHeadModel
 from utils import customer_total_value
-from utils2 import retrieve_the_multiple_products_in_one_invoice_list
+import json
+
 
 app = FastAPI()
 
@@ -39,10 +40,8 @@ async def get_answer_for_question(question: str):
     
 @app.post("/get_total_value")
 async def get_total_value():
-    csv_file = "erp100.csv"
-    return customer_total_value(csv_file)
-
-
+    result = migrate_total_value_and_customer_names()
+    return json.loads(result)
 
 if __name__ == "__main__":
     import uvicorn
