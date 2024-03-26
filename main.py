@@ -1,9 +1,9 @@
 from fastapi import FastAPI, HTTPException
 from sklearn.feature_extraction.text import TfidfVectorizer
-from qapairs import CleanedDataSet, migrate_total_value_and_customer_names
+from qapairs import CleanedDataSet
 from chatbot import preprocess_data, get_answer
 from transformers import GPT2Tokenizer, GPT2LMHeadModel
-from utils import customer_total_value
+from utils import calculate_customer_totals
 import json
 
 
@@ -40,7 +40,8 @@ async def get_answer_for_question(question: str):
     
 @app.post("/get_total_value")
 async def get_total_value():
-    result = migrate_total_value_and_customer_names()
+    result = calculate_customer_totals("erp100.csv")
+    print(len(result))
     return json.loads(result)
 
 if __name__ == "__main__":
